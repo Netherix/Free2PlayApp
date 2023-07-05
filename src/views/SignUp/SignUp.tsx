@@ -2,27 +2,40 @@ import * as React from 'react';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
-import Link from '@mui/material/Link';
+import { Link } from 'react-router-dom';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-
-
+import { auth } from '../../firebase'
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { useState } from 'react';
 
 // TODO remove, this demo shouldn't need to reset the theme.
 const defaultTheme = createTheme();
 
 export default function SignUp() {
+
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+
+
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    console.log({
-      username: data.get('username'),
-      email: data.get('email'),
-      password: data.get('password'),
-    });
+    createUserWithEmailAndPassword(auth, email, password)
+      .then((userCredential) => {
+        // Signed in 
+        const user = userCredential.user;
+        console.log(user)
+        // ...
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        console.log(errorCode, errorMessage)
+      });
+
   };
 
   return (
@@ -50,6 +63,7 @@ export default function SignUp() {
               name="username"
               autoComplete="username"
               autoFocus
+
             />
             <TextField
               margin="normal"
@@ -60,6 +74,8 @@ export default function SignUp() {
               name="email"
               autoComplete="email"
               autoFocus
+              onChange={(event) => { setEmail(event.target.value) }}
+              value={email}
             />
             <TextField
               margin="normal"
@@ -70,6 +86,8 @@ export default function SignUp() {
               type="password"
               id="password"
               autoComplete="current-password"
+              onChange={(event) => { setPassword(event.target.value) }}
+              value={password}
             />
             <Button
               type="submit"
@@ -81,7 +99,7 @@ export default function SignUp() {
             </Button>
             <Grid container>
               <Grid item>
-                <Link href="#" variant="body2" className='text-decoration-none text-secondary'>
+                <Link to="/signin" className='text-decoration-none text-secondary'>
                   {"Already have an account?"}
                 </Link>
               </Grid>
